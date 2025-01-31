@@ -6,12 +6,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import br.com.interBank.TransferRepository;
+
 import br.com.interBank.dtos.request.TransferenciaRequestDTO;
 import br.com.interBank.dtos.response.CreateResponseDTO;
 import br.com.interBank.dtos.response.TransferenciaResponseDTO;
 import br.com.interBank.entities.TransferEntity;
 import br.com.interBank.mappers.TransferMapper;
+import br.com.interBank.repositories.TransferRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

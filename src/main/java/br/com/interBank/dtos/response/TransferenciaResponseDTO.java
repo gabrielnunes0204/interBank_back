@@ -19,6 +19,7 @@ public class TransferenciaResponseDTO {
 	private Long contaOrigem;
 	private Long contaDestino;
 	private BigDecimal valorTransferencia;
+	private BigDecimal valorTaxa;
 	private LocalDateTime dataHoraTransferencia;
 	private LocalDateTime dataHoraAgendamento;
 }

@@ -1,6 +1,7 @@
 package br.com.interBank.services;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -45,9 +46,10 @@ public class TransferService {
 			entity.setDataHoraAgendamento(LocalDateTime.now());
 			BigDecimal valorTaxa = this.aplicarTaxa(
 					entity.getDataHoraAgendamento(),
-					entity.getDataHoraTransferencia());
+					entity.getDataHoraTransferencia(),
+					entity.getValorTransferencia());
 			
-			entity.setValorTransferencia(entity.getValorTransferencia().add(valorTaxa));
+			entity.setValorTaxa(valorTaxa);
 			this.transferRepository.save(entity);
 			
 			return new CreateResponseDTO(
@@ -64,30 +66,33 @@ public class TransferService {
 		}
 	}
 	
-	private BigDecimal aplicarTaxa(LocalDateTime dataHoraAtual, LocalDateTime dataHoraAgendamento) {
-        Long diasDeDiferenca = ChronoUnit.DAYS.between(dataHoraAtual, dataHoraAgendamento);
-        BigDecimal taxa = BigDecimal.ZERO;
-        
-		if (diasDeDiferenca == 0) {
-			taxa = new BigDecimal(3);
-			taxa = taxa.add(taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.025")))); //2.5%
+	private BigDecimal aplicarTaxa(LocalDateTime dataHoraAtual, LocalDateTime dataHoraAgendamento, BigDecimal valor) {
+		LocalDate dataHoraAtualDate = dataHoraAtual.toLocalDate();
+		LocalDate dataHoraAgendamentoDate = dataHoraAgendamento.toLocalDate();
+		Long diasDeDiferenca = ChronoUnit.DAYS.between(dataHoraAtualDate, dataHoraAgendamentoDate);
 		
-		} else if (diasDeDiferenca >= 0 && diasDeDiferenca <= 10) {
-			taxa = taxa.add(new BigDecimal(12));
-		
-		} else if (diasDeDiferenca >= 11 && diasDeDiferenca <= 20) {
-			taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.082"))); //8.2%
-		
-		} else if (diasDeDiferenca >= 21 && diasDeDiferenca <= 30) {
-			taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.069"))); //6.9%
-		
-		} else if (diasDeDiferenca >= 31 && diasDeDiferenca <= 40) {
-			taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.047"))); //4.7%
-		
-		} else if (diasDeDiferenca >= 41 && diasDeDiferenca <= 50) {
-			taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.017"))); //1.7%
-		}
-		
-		return taxa;
+	    BigDecimal taxa = BigDecimal.ZERO;
+	    
+	    if (diasDeDiferenca == 0) {
+	    	BigDecimal valorComTaxaFixa = valor.add(new BigDecimal(3));
+	    	taxa = valorComTaxaFixa.multiply(new BigDecimal("0.025")).add(new BigDecimal(3));  //2.5%
+	    
+	    } else if (diasDeDiferenca >= 1 && diasDeDiferenca <= 10) {
+	        taxa = taxa.add(new BigDecimal(12));
+	    
+	    } else if (diasDeDiferenca >= 11 && diasDeDiferenca <= 20) {
+	        taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.082"))); // 8.2%
+	    
+	    } else if (diasDeDiferenca >= 21 && diasDeDiferenca <= 30) {
+	        taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.069"))); // 6.9%
+	    
+	    } else if (diasDeDiferenca >= 31 && diasDeDiferenca <= 40) {
+	        taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.047"))); // 4.7%
+	    
+	    } else if (diasDeDiferenca >= 41 && diasDeDiferenca <= 50) {
+	        taxa = taxa.multiply(BigDecimal.ONE.add(new BigDecimal("0.017"))); // 1.7%
+	    }
+	    
+	    return taxa;
 	}
 }
